@@ -43,9 +43,16 @@ public class UsuarioConverter {
     }
 
     public List<Telefone> paraListaTelefones(List<TelefoneDTO> telefoneDTOS) {
-        return telefoneDTOS.stream()
-                .map(this::paraTelefone)
-                .toList();
+
+        List<Telefone> telefones = new ArrayList<>();
+
+        if (telefoneDTOS != null) {
+            for (TelefoneDTO telefoneDTO : telefoneDTOS) {
+                telefones.add(paraTelefone(telefoneDTO));
+            }
+        }
+
+        return telefones;
     }
 
     public Telefone paraTelefone(TelefoneDTO telefoneDTO) {
@@ -85,11 +92,16 @@ public class UsuarioConverter {
                 .build();
     }
 
-    public List<TelefoneDTO> paraListaTelefonesDTO(List<Telefone> telefoneDTOS){
-        return telefoneDTOS.stream().map(this::paraTelefoneDTO).toList();
-        //transforma tudo em um telefone, depois com o toList, transforma em uma lista
-        //pega a lista de parametro telefoneDTOS, depois itera com o método paraTelefone
+    public List<TelefoneDTO> paraListaTelefonesDTO(List<Telefone> telefoneDTOS) {
 
+        List<TelefoneDTO> telefones = new ArrayList<>();//Nova lista de TelefoneDTO chamada telefones
+        if (telefoneDTOS != null) {//evitar nullPointerException
+            for (Telefone telefone : telefoneDTOS) {//Loop na list existente chamado telefoneDTOS
+                //no Telefone - é a lista de parametro. No telefone - é a váriavel de loop
+                telefones.add(paraTelefoneDTO(telefone));//lista atual: adicione a conversão para telefoneDTO
+            }
+        }
+        return telefones;
     }
 
     public TelefoneDTO paraTelefoneDTO(Telefone telefoneDTO){
