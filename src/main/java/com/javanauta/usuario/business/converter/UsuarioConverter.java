@@ -96,7 +96,7 @@ public class UsuarioConverter {
 
         List<TelefoneDTO> telefones = new ArrayList<>();//Nova lista de TelefoneDTO chamada telefones
         if (telefoneDTOS != null) {//evitar nullPointerException
-            for (Telefone telefone : telefoneDTOS) {//Loop na list existente chamado telefoneDTOS
+            for (Telefone telefone : telefoneDTOS) {//Loop na list existentee chamado telefoneDTOS
                 //no Telefone - é a lista de parametro. No telefone - é a váriavel de loop
                 telefones.add(paraTelefoneDTO(telefone));//lista atual: adicione a conversão para telefoneDTO
             }
@@ -108,6 +108,17 @@ public class UsuarioConverter {
         return TelefoneDTO.builder()
                 .numero(telefoneDTO.getNumero())
                 .ddd(telefoneDTO.getDdd())
+                .build();
+    }
+
+    public Usuario updateUsuario(UsuarioDTO usuarioDTO, Usuario entity){//metodo de update exclusivo de usuario
+        return Usuario.builder()
+                .nome(usuarioDTO.getNome() != null ? usuarioDTO.getNome() : entity.getNome())//Lemrbar que errei o método ao fechar com ()), interrompendo o fluxo do ternário.
+                .id(entity.getId())
+                .senha(usuarioDTO.getSenha() != null ? usuarioDTO.getSenha() : entity.getSenha())
+                .email(usuarioDTO.getEmail() != null ? usuarioDTO.getEmail() : entity.getEmail())
+                .enderecos(entity.getEnderecos())
+                .telefones(entity.getTelefones())
                 .build();
     }
 

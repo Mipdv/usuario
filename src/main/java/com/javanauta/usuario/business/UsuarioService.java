@@ -6,6 +6,7 @@ import com.javanauta.usuario.business.dto.UsuarioDTO;
 import com.javanauta.usuario.infrastructure.entity.Usuario;
 import com.javanauta.usuario.infrastructure.exceptions.ResourceNotFoundException;
 import com.javanauta.usuario.infrastructure.repository.UsuarioRepository;
+import com.javanauta.usuario.infrastructure.security.JwtUtil;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +20,7 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioConverter usuarioConverter;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public UsuarioDTO salvaUsuario (UsuarioDTO usuarioDTO){
         emailExiste(usuarioDTO.getEmail());
@@ -56,5 +58,22 @@ public class UsuarioService {
     public void deletaUsuarioPorEmail(String email){
         usuarioRepository.deleteByEmail(email);
     }
+
+    public UsuarioDTO atualizarDadosUsuario(String token, UsuarioDTO dto){
+      String email = jwtUtil.extratirEmailToken(token.substring(7));
+      dto.setSenha(dto.getSenha() != null ? passwordEncoder.encode(dto.getSenha()) : null);
+      //busca o usuario no banco de daos
+      Usuario usuarioEntity = usuarioRepository.findByEmail(email).orElseThrow(() ->
+              new ResourceNotFoundException("Email não localizado"));
+      //difcil de acontecer, visto que estamos procurando um email que já está no token. Ou seja, não tem como retornar null
+        //mesclou os dados que recebemos na requisição DTO com os dados do banco de dados
+        Usuario usuario = usuarioConverter.updateUsuario(dto, usuarioEntity);
+//        usuario.setSenha(passwordEncoder.encode(usuario.getPassword()));//encripta a senha - cuidado com a dupla encriptação
+        //salvou os dados do usuario convertido e depois pegou o retorno e converteu para UsuarioDTO
+        return usuarioConverter.paraUsuarioDTO(usuarioRepository.save(usuario));
+    }
+
+    //Criar metodo para transferencia no postman de entity para DTO
+    //Criar metodo para update nos dados
 
 }
