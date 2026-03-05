@@ -2,9 +2,15 @@ package com.javanauta.usuario.business;
 
 
 import com.javanauta.usuario.business.converter.UsuarioConverter;
+import com.javanauta.usuario.business.dto.EnderecoDTO;
+import com.javanauta.usuario.business.dto.TelefoneDTO;
 import com.javanauta.usuario.business.dto.UsuarioDTO;
+import com.javanauta.usuario.infrastructure.entity.Endereco;
+import com.javanauta.usuario.infrastructure.entity.Telefone;
 import com.javanauta.usuario.infrastructure.entity.Usuario;
 import com.javanauta.usuario.infrastructure.exceptions.ResourceNotFoundException;
+import com.javanauta.usuario.infrastructure.repository.EndrecoRepository;
+import com.javanauta.usuario.infrastructure.repository.TelefoneRepository;
 import com.javanauta.usuario.infrastructure.repository.UsuarioRepository;
 import com.javanauta.usuario.infrastructure.security.JwtUtil;
 import lombok.AllArgsConstructor;
@@ -21,6 +27,8 @@ public class UsuarioService {
     private final UsuarioConverter usuarioConverter;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EndrecoRepository endrecoRepository;
+    private final TelefoneRepository telefoneRepository;
 
     public UsuarioDTO salvaUsuario (UsuarioDTO usuarioDTO){
         emailExiste(usuarioDTO.getEmail());
@@ -48,11 +56,17 @@ public class UsuarioService {
         return usuarioRepository.existsByEmail(email);
     }
 
-    public Usuario buscarUsuarioPorEmail(String email){ //metodo para encontrar por email
-        return usuarioRepository.findByEmail(email).//retorna o usuario interface da repository para encontrar por email no postman
-                orElseThrow(()-> new ResourceNotFoundException("usuario não existente " + email));
-        //taca o erro de usuario nao existente + mensagem
-        //poderia ter sido tratado com != null
+    public UsuarioDTO buscarUsuarioPorEmail(String email) { //metodo para encontrar por email
+        try {
+            return usuarioConverter.paraUsuarioDTO(usuarioRepository
+                    .findByEmail(email).//retorna o usuario interface da repository para encontrar por email no postman
+                    orElseThrow(() -> new ResourceNotFoundException("email não existente " + email))
+            );
+            //taca o erro de usuario nao existente + mensagem
+            //poderia ter sido tratado com != null
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException("Email não encontrado " + email);
+        }
     }
 
     public void deletaUsuarioPorEmail(String email){
@@ -71,6 +85,21 @@ public class UsuarioService {
 //        usuario.setSenha(passwordEncoder.encode(usuario.getPassword()));//encripta a senha - cuidado com a dupla encriptação
         //salvou os dados do usuario convertido e depois pegou o retorno e converteu para UsuarioDTO
         return usuarioConverter.paraUsuarioDTO(usuarioRepository.save(usuario));
+    }
+
+    public EnderecoDTO atualizaEndereco(Long idEndereco, EnderecoDTO enderecoDTO){
+        Endereco entity = endrecoRepository.findById(idEndereco).orElseThrow(()->
+        new ResourceNotFoundException("Id não encontrado " + idEndereco));
+        Endereco endereco = usuarioConverter.updateEndereco(enderecoDTO, entity);
+
+        return usuarioConverter.paraEnderecoDTO(endrecoRepository.save(endereco));
+    }
+
+    public TelefoneDTO atualizaTelefone(Long idTelefone, TelefoneDTO telefoneDTO){
+        Telefone entity = telefoneRepository.findById(idTelefone).orElseThrow(()->
+                new ResourceNotFoundException("Telefone não encontrado " + idTelefone));
+        Telefone telefone = usuarioConverter.updateTelefone(telefoneDTO, entity);
+        return usuarioConverter.paraTelefoneDTO(telefoneRepository.save(telefone));
     }
 
     //Criar metodo para transferencia no postman de entity para DTO
