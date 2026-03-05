@@ -1,6 +1,5 @@
 package com.javanauta.usuario.business;
 
-
 import com.javanauta.usuario.business.converter.UsuarioConverter;
 import com.javanauta.usuario.business.dto.EnderecoDTO;
 import com.javanauta.usuario.business.dto.TelefoneDTO;
@@ -8,6 +7,7 @@ import com.javanauta.usuario.business.dto.UsuarioDTO;
 import com.javanauta.usuario.infrastructure.entity.Endereco;
 import com.javanauta.usuario.infrastructure.entity.Telefone;
 import com.javanauta.usuario.infrastructure.entity.Usuario;
+import com.javanauta.usuario.infrastructure.exceptions.ConflictExcpection;
 import com.javanauta.usuario.infrastructure.exceptions.ResourceNotFoundException;
 import com.javanauta.usuario.infrastructure.repository.EndrecoRepository;
 import com.javanauta.usuario.infrastructure.repository.TelefoneRepository;
@@ -45,10 +45,10 @@ public class UsuarioService {
         try{
             boolean existe = verificaEmailExistente(email);
             if(existe){
-                throw new com.henrique.aprendendospring.infrascruture.exceptions.ConflictExcpection("Email já cadastrado" + email);
+                throw new ConflictExcpection("Email já cadastrado" + email);
             }
-        } catch (com.henrique.aprendendospring.infrascruture.exceptions.ConflictExcpection e){
-            throw new com.henrique.aprendendospring.infrascruture.exceptions.ConflictExcpection("Email já cadastrado" + e.getCause());
+        } catch (ConflictExcpection e){
+            throw new ConflictExcpection("Email já cadastrado" + e.getCause());
         }
     }
 
