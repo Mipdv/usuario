@@ -1,4 +1,4 @@
-package com.henrique.aprendendospring.infrascruture.exceptions;
+package com.javanauta.usuario.infrastructure.exceptions;
 
 public class ConflictExcpection extends RuntimeException{
     public ConflictExcpection(String mensagem){
@@ -6,6 +6,6 @@ public class ConflictExcpection extends RuntimeException{
     }
 
     public ConflictExcpection(String mensagem, Throwable throwable){
-        super(mensagem);
+        super(mensagem, throwable);
     }
 }

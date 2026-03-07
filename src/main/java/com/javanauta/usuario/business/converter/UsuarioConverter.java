@@ -81,14 +81,15 @@ public class UsuarioConverter {
         return enderecos;
     }
 
-    public EnderecoDTO paraEnderecoDTO(Endereco enderecoDTO){
+    public EnderecoDTO paraEnderecoDTO(Endereco endereco){//metodo refatorado retirando o DTO do parametro e dos atributos do return
         return EnderecoDTO.builder()
-                .rua(enderecoDTO.getRua())
-                .numero(enderecoDTO.getNumero())
-                .cidade(enderecoDTO.getCidade())
-                .complemento(enderecoDTO.getComplemento())
-                .cep(enderecoDTO.getCep())
-                .estado(enderecoDTO.getEstado())
+                .id(endereco.getId())
+                .rua(endereco.getRua())
+                .numero(endereco.getNumero())
+                .cidade(endereco.getCidade())
+                .complemento(endereco.getComplemento())
+                .cep(endereco.getCep())
+                .estado(endereco.getEstado())
                 .build();
     }
 
@@ -96,7 +97,7 @@ public class UsuarioConverter {
 
         List<TelefoneDTO> telefones = new ArrayList<>();//Nova lista de TelefoneDTO chamada telefones
         if (telefoneDTOS != null) {//evitar nullPointerException
-            for (Telefone telefone : telefoneDTOS) {//Loop na list existente chamado telefoneDTOS
+            for (Telefone telefone : telefoneDTOS) {//Loop na list existentee chamado telefoneDTOS
                 //no Telefone - é a lista de parametro. No telefone - é a váriavel de loop
                 telefones.add(paraTelefoneDTO(telefone));//lista atual: adicione a conversão para telefoneDTO
             }
@@ -104,10 +105,62 @@ public class UsuarioConverter {
         return telefones;
     }
 
-    public TelefoneDTO paraTelefoneDTO(Telefone telefoneDTO){
+    public TelefoneDTO paraTelefoneDTO(Telefone telefone){
         return TelefoneDTO.builder()
-                .numero(telefoneDTO.getNumero())
-                .ddd(telefoneDTO.getDdd())
+                .id(telefone.getId())
+                .numero(telefone.getNumero())
+                .ddd(telefone.getDdd())
+                .build();
+    }
+
+    public Usuario updateUsuario(UsuarioDTO usuarioDTO, Usuario entity){//metodo de update exclusivo de usuario
+        return Usuario.builder()
+                .nome(usuarioDTO.getNome() != null ? usuarioDTO.getNome() : entity.getNome())//Lemrbar que errei o método ao fechar com ()), interrompendo o fluxo do ternário.
+                .id(entity.getId())
+                .senha(usuarioDTO.getSenha() != null ? usuarioDTO.getSenha() : entity.getSenha())
+                .email(usuarioDTO.getEmail() != null ? usuarioDTO.getEmail() : entity.getEmail())
+                .enderecos(entity.getEnderecos())
+                .telefones(entity.getTelefones())
+                .build();
+    }
+
+    public Endereco updateEndereco(EnderecoDTO dto, Endereco entity){
+        return Endereco.builder()
+                .id(entity.getId())
+                .rua(dto.getRua() !=null ? dto.getRua() : entity.getRua())
+                .numero(dto.getNumero() !=null ? dto.getNumero() : entity.getNumero())
+                .complemento(dto.getComplemento() !=null ? dto.getComplemento() : entity.getComplemento())
+                .cidade(dto.getCidade() !=null ? dto.getCidade() : entity.getCidade())
+                .estado(dto.getEstado() !=null ? dto.getEstado() : entity.getEstado())
+                .cep(dto.getCep() !=null ? dto.getCep() : entity.getCep())
+                .build();
+    }
+
+    public Telefone updateTelefone(TelefoneDTO dto, Telefone entity){
+        return Telefone.builder()
+                .id(entity.getId())
+                .numero(dto.getNumero() !=null ? dto.getNumero() : entity.getNumero())
+                .ddd(dto.getDdd() !=null ? dto.getDdd() : entity.getDdd())//troquei o entity pelo dto, visto que estou trabalhando com dtos
+                .build();
+    }
+
+    public Endereco paraEnderecoEnity(EnderecoDTO dto, Long idUsuario){
+        return Endereco.builder()
+                .rua(dto.getRua())
+                .numero(dto.getNumero())
+                .complemento(dto.getComplemento())
+                .cidade(dto.getCidade())
+                .estado(dto.getEstado())
+                .cep(dto.getCep())
+                .usuario_id(idUsuario)
+                .build();
+    }
+
+    public Telefone paraTelefoneEnity(TelefoneDTO dto, Long idUsuario){
+        return Telefone.builder()
+                .numero(dto.getNumero())
+                .ddd(dto.getDdd())
+                .usuario_id(idUsuario)
                 .build();
     }
 
